@@ -15,7 +15,7 @@ data <- read_csv("CausesOfDeath_France_2001-2008_.csv") %>%
          coverage = DEATHS*100/total) %>%
   arrange(desc(coverage))
 
-# obtain top 10 leading causes of death for females ------------------------------------
+# Analysing data for females -------------- ------------------------------------
 female <- data%>%                           # data for females only
   filter(SEX == "Females") %>%
   select(YEAR, SEX, CAUSE, DEATHS) 
@@ -23,18 +23,18 @@ female <- data%>%                           # data for females only
 #summary table for females_ grouped cause of death across years
 f_summary <- female %>%                     
   group_by(CAUSE)%>%
-  summarise(t_f = sum(DEATHS),
-            m_f = mean(DEATHS),
+  summarise(t_f = sum(DEATHS),             #total no. of female deaths across 2001-2008
+            m_f = mean(DEATHS),            #mean no. deaths per year
             s_f = sd(DEATHS),
             n_f = n()) %>%
-  arrange(desc(m_f)) %>%
-  mutate(total_f = sum(t_f),
-         coverage_f = t_f*100/total_f,
-         rank = rank(-coverage_f),
+  arrange(desc(m_f)) %>%                   #arrange from most to least deaths
+  mutate(total_f = sum(t_f),               #add col. for total number of deaths
+         coverage_f = t_f*100/total_f,     #add col, for percentage of deaths covered by cause
+         rank = rank(-coverage_f),         #add col. for ranking from most to least deaths
          SEX = "Female")
 ungroup()
 
-### final: Leading cause of death for females ###
+### final table: Leading cause of death for females ###
 top10_f <- f_summary %>%                    
   filter(rank < 11) %>%
   select(CAUSE, rank, coverage_f, SEX)%>%
@@ -50,7 +50,7 @@ fp <- ggplot(top10_f, aes(x = percentage)) +
 
 #changing axis tick mark labels
 fp1 <- fp + 
-  theme(axis.text.x = element_text(size = 12), #edit aesthetics, label orientation, colour
+  theme(axis.text.x = element_text(size = 12),                          #edit aesthetics, label orientation, colour
         axis.text.y = element_text(size = 10),
         axis.line = element_line(color = "grey", size = 0.5))+
   scale_x_continuous(name = "Percentage of total female deaths (%)")+
